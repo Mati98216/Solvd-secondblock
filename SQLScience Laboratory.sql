@@ -1,17 +1,16 @@
-DROP DATABASE IF EXISTS science_laboratory;
-CREATE DATABASE science_laboratory;
+CREATE DATABASE IF NOT EXISTS science_laboratory;
 USE science_laboratory;
 -- Table: departments
-CREATE TABLE departments (
+CREATE TABLE IF NOT EXISTS departments (
     department_id INT PRIMARY KEY AUTO_INCREMENT,
     department_name VARCHAR(100) NOT NULL
 );
-CREATE TABLE research_areas (
+CREATE TABLE IF NOT EXISTS research_areas (
     area_id INT PRIMARY KEY AUTO_INCREMENT,
     area_name VARCHAR(100) NOT NULL
 );
 -- Table: scientists
-CREATE TABLE scientists (
+CREATE TABLE IF NOT EXISTS scientists (
     scientist_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE,
@@ -22,7 +21,7 @@ CREATE TABLE scientists (
 );
 
 -- Table: laboratory_assistants
-CREATE TABLE laboratory_assistants (
+CREATE TABLE IF NOT EXISTS laboratory_assistants (
     assistant_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE,
@@ -34,7 +33,7 @@ CREATE TABLE laboratory_assistants (
 
 
 -- Table: experiments
-CREATE TABLE experiments (
+CREATE TABLE IF NOT EXISTS experiments (
     experiment_id INT PRIMARY KEY AUTO_INCREMENT,
     experiment_name VARCHAR(100) NOT NULL,
     scientist_id INT,
@@ -42,7 +41,7 @@ CREATE TABLE experiments (
 );
 
 -- Table: analysis
-CREATE TABLE analysis (
+CREATE TABLE IF NOT EXISTS analysis (
     analysis_id INT PRIMARY KEY AUTO_INCREMENT,
     analysis_name VARCHAR(100) NOT NULL,
     scientist_id INT,
@@ -52,7 +51,7 @@ CREATE TABLE analysis (
 );
 
 -- Table: experiment_results
-CREATE TABLE experiment_results (
+CREATE TABLE IF NOT EXISTS experiment_results (
     result_id INT PRIMARY KEY AUTO_INCREMENT,
     experiment_id INT,
     analysis_id INT,
@@ -62,7 +61,7 @@ CREATE TABLE experiment_results (
 );
 
 -- Table: equipment
-CREATE TABLE equipment (
+CREATE TABLE IF NOT EXISTS equipment (
     equipment_id INT PRIMARY KEY AUTO_INCREMENT,
     equipment_name VARCHAR(100) NOT NULL,
     department_id INT,
@@ -70,16 +69,16 @@ CREATE TABLE equipment (
 );
 
 -- Table: experiment_equipment
-CREATE TABLE experiment_equipment (
+CREATE TABLE IF NOT EXISTS experiment_equipment (
+	experiment_equipment_id INT PRIMARY KEY AUTO_INCREMENT,
     experiment_id INT,
     equipment_id INT,
-    PRIMARY KEY (experiment_id, equipment_id),
     FOREIGN KEY (experiment_id) REFERENCES experiments(experiment_id),
     FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
 );
 
 -- Table: experiment_timeline
-CREATE TABLE experiment_timeline (
+CREATE TABLE IF NOT EXISTS experiment_timeline (
     timeline_id INT PRIMARY KEY AUTO_INCREMENT,
     experiment_id INT,
     start_date DATE,
@@ -88,7 +87,7 @@ CREATE TABLE experiment_timeline (
 );
 
 -- Table: publications
-CREATE TABLE publications (
+CREATE TABLE IF NOT EXISTS publications (
     publication_id INT PRIMARY KEY AUTO_INCREMENT,
     publication_title VARCHAR(255) NOT NULL,
     publication_date DATE,
@@ -97,10 +96,10 @@ CREATE TABLE publications (
 );
 
 -- Table: experiment_publications
-CREATE TABLE experiment_publications (
+CREATE TABLE IF NOT EXISTS experiment_publications (
+	experiment_publications_id INT PRIMARY KEY AUTO_INCREMENT,
     experiment_id INT,
     publication_id INT,
-    PRIMARY KEY (experiment_id, publication_id),
     FOREIGN KEY (experiment_id) REFERENCES experiments(experiment_id),
     FOREIGN KEY (publication_id) REFERENCES publications(publication_id)
 );
