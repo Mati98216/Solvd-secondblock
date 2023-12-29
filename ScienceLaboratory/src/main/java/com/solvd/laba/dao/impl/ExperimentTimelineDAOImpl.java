@@ -1,155 +1,104 @@
 package com.solvd.laba.dao.impl;
-import com.solvd.laba.database.ConnectionPool;
+
 import com.solvd.laba.dao.interfaces.ExperimentTimelineDAO;
-import com.solvd.laba.database.DatabaseConnection;
+import com.solvd.laba.database.ConnectionPool;
+import com.solvd.laba.domain.Experiment;
 import com.solvd.laba.domain.ExperimentTimeline;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class ExperimentTimelineDAOImpl implements ExperimentTimelineDAO {
-    private ConnectionPool connectionPool;
+public class ExperimentTimelineDAOImpl extends AbstractDAO<ExperimentTimeline, Integer> implements ExperimentTimelineDAO {
 
     public ExperimentTimelineDAOImpl(ConnectionPool connectionPool) {
-        this.connectionPool = connectionPool;
+        super(connectionPool);
     }
 
     @Override
-    public void addExperimentTimeline(ExperimentTimeline experimentTimeline) throws SQLException {
-        String sql = "INSERT INTO experiment_timeline (experiment_id, start_date, end_date) VALUES (?, ?, ?)";
-        DatabaseConnection dbConnection = null;
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
+    protected ExperimentTimeline createEntity(ResultSet resultSet) throws SQLException {
+        ExperimentTimeline timeline = new ExperimentTimeline();
+        timeline.setTimelineId(resultSet.getInt("timeline_id"));
 
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, experimentTimeline.getExperimentId());
-                statement.setDate(2, experimentTimeline.getStartDate());
-                statement.setDate(3, experimentTimeline.getEndDate());
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
+        Experiment experiment = new Experiment(); // Assuming you have a method to create an Experiment object
+        experiment.setExperimentId(resultSet.getInt("experiment_id"));
+
+        timeline.setExperiment(experiment);
+
+        timeline.setStartDate(resultSet.getDate("start_date"));
+        timeline.setEndDate(resultSet.getDate("end_date"));
+
+        return timeline;
     }
 
     @Override
-    public ExperimentTimeline getExperimentTimelineById(int id) throws SQLException {
-        String sql = "SELECT * FROM experiment_timeline WHERE timeline_id = ?";
-        ExperimentTimeline experimentTimeline = null;
-        DatabaseConnection dbConnection = null;
-
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, id);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        experimentTimeline = new ExperimentTimeline(
-                                resultSet.getInt("timeline_id"),
-                                resultSet.getInt("experiment_id"),
-                                resultSet.getDate("start_date"),
-                                resultSet.getDate("end_date")
-                        );
-                    }
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
-        return experimentTimeline;
+    protected String getCreateQuery() {
+        return "INSERT INTO experiment_timelines (experiment_id, start_date, end_date) VALUES (?, ?, ?)";
     }
 
     @Override
-    public List<ExperimentTimeline> getAllExperimentTimelines() throws SQLException {
-        List<ExperimentTimeline> experimentTimelines = new ArrayList<>();
-        String sql = "SELECT * FROM experiment_timeline";
-        DatabaseConnection dbConnection = null;
-
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql);
-                 ResultSet resultSet = statement.executeQuery()) {
-
-                while (resultSet.next()) {
-                    experimentTimelines.add(new ExperimentTimeline(
-                            resultSet.getInt("timeline_id"),
-                            resultSet.getInt("experiment_id"),
-                            resultSet.getDate("start_date"),
-                            resultSet.getDate("end_date")
-                    ));
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
-        return experimentTimelines;
+    protected void setCreateStatement(PreparedStatement statement, ExperimentTimeline timeline) throws SQLException {
+        statement.setInt(1, timeline.getExperiment().getExperimentId());
+        statement.setDate(2, new java.sql.Date(timeline.getStartDate().getTime()));
+        statement.setDate(3, new java.sql.Date(timeline.getEndDate().getTime()));
     }
 
     @Override
-    public void updateExperimentTimeline(ExperimentTimeline experimentTimeline) throws SQLException {
-        String sql = "UPDATE experiment_timeline SET experiment_id = ?, start_date = ?, end_date = ? WHERE timeline_id = ?";
-        DatabaseConnection dbConnection = null;
-
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, experimentTimeline.getExperimentId());
-                statement.setDate(2, experimentTimeline.getStartDate());
-                statement.setDate(3, experimentTimeline.getEndDate());
-                statement.setInt(4, experimentTimeline.getTimelineId());
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
+    protected String getReadQuery() {
+        return "SELECT et.*, e.experiment_name " +
+                "FROM experiment_timelines et " +
+                "LEFT JOIN experiments e ON et.experiment_id = e.experiment_id " +
+                "WHERE et.timeline_id = ?";
     }
 
     @Override
-    public void deleteExperimentTimeline(int id) throws SQLException {
-        String sql = "DELETE FROM experiment_timeline WHERE timeline_id = ?";
-        DatabaseConnection dbConnection = null;
+    protected void setReadStatement(PreparedStatement statement, Integer id) throws SQLException {
+        statement.setInt(1, id);
+    }
 
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
+    @Override
+    protected String getUpdateQuery() {
+        return "UPDATE experiment_timelines SET experiment_id = ?, start_date = ?, end_date = ? WHERE timeline_id = ?";
+    }
 
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, id);
-                statement.executeUpdate();
+    @Override
+    protected void setUpdateStatement(PreparedStatement statement, ExperimentTimeline timeline) throws SQLException {
+        statement.setInt(1, timeline.getExperiment().getExperimentId());
+        statement.setDate(2, new java.sql.Date(timeline.getStartDate().getTime()));
+        statement.setDate(3, new java.sql.Date(timeline.getEndDate().getTime()));
+        statement.setInt(4, timeline.getTimelineId());
+    }
+
+    @Override
+    protected String getDeleteQuery() {
+        return "DELETE FROM experiment_timelines WHERE timeline_id = ?";
+    }
+
+    @Override
+    protected void setDeleteStatement(PreparedStatement statement, Integer id) throws SQLException {
+        statement.setInt(1, id);
+    }
+
+    @Override
+    public List<ExperimentTimeline> findAll() throws SQLException {
+        List<ExperimentTimeline> timelines = new ArrayList<>();
+        try (Connection connection = connectionPool.getConnection().getSqlConnection();
+             PreparedStatement statement = connection.prepareStatement(getFindAllQuery())) {
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                timelines.add(createEntity(resultSet));
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
+            throw new RuntimeException("Operation interrupted", e);
         }
+        return timelines;
+    }
+
+    protected String getFindAllQuery() {
+        return "SELECT et.*, e.experiment_name " +
+                "FROM experiment_timelines et " +
+                "LEFT JOIN experiments e ON et.experiment_id = e.experiment_id";
     }
 }
+

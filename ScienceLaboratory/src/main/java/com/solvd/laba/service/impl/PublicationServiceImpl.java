@@ -1,67 +1,61 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.PublicationDAO;
 import com.solvd.laba.domain.Publication;
+import com.solvd.laba.mybatis.PublicationMapper;
 import com.solvd.laba.service.interfaces.PublicationService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class PublicationServiceImpl implements PublicationService {
-    private PublicationDAO publicationDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public PublicationServiceImpl(PublicationDAO publicationDAO) {
-        this.publicationDAO = publicationDAO;
+    public PublicationServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addPublication(Publication publication) throws ServiceException {
-        try {
-
-            publicationDAO.addPublication(publication);
-        } catch (SQLException e) {
-            throw new ServiceException("Error adding publication", e);
+    public void addPublication(Publication publication) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            PublicationMapper mapper = session.getMapper(PublicationMapper.class);
+            mapper.insert(publication);
+            session.commit();
         }
     }
 
     @Override
-    public Publication getPublicationById(int id) throws ServiceException {
-        try {
-
-            return publicationDAO.getPublicationById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving publication by ID", e);
+    public Publication getPublicationById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            PublicationMapper mapper = session.getMapper(PublicationMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<Publication> getAllPublications() throws ServiceException {
-        try {
-
-            return publicationDAO.getAllPublications();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all publications", e);
+    public List<Publication> getAllPublications() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            PublicationMapper mapper = session.getMapper(PublicationMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updatePublication(Publication publication) throws ServiceException {
-        try {
-
-            publicationDAO.updatePublication(publication);
-        } catch (SQLException e) {
-            throw new ServiceException("Error updating publication", e);
+    public void updatePublication(Publication publication) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            PublicationMapper mapper = session.getMapper(PublicationMapper.class);
+            mapper.update(publication);
+            session.commit();
         }
     }
 
     @Override
-    public void deletePublication(int id) throws ServiceException {
-        try {
-
-            publicationDAO.deletePublication(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting publication", e);
+    public void deletePublication(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            PublicationMapper mapper = session.getMapper(PublicationMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
 }
+

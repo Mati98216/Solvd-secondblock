@@ -3,6 +3,8 @@ package com.solvd.laba.dao.impl;
 import com.solvd.laba.database.ConnectionPool;
 import com.solvd.laba.dao.interfaces.ScientistDAO;
 import com.solvd.laba.database.DatabaseConnection;
+import com.solvd.laba.domain.Department;
+import com.solvd.laba.domain.ResearchArea;
 import com.solvd.laba.domain.Scientist;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,145 +13,92 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScientistDAOImpl implements ScientistDAO {
-    private ConnectionPool connectionPool;
+public class ScientistDAOImpl extends AbstractDAO<Scientist, Integer> implements ScientistDAO {
 
     public ScientistDAOImpl(ConnectionPool connectionPool) {
-        this.connectionPool = connectionPool;
+        super(connectionPool);
     }
 
     @Override
-    public void addScientist(Scientist scientist) throws SQLException {
-        String sql = "INSERT INTO scientists (name, email, department_id, area_id) VALUES (?, ?, ?, ?)";
-        DatabaseConnection dbConnection = null;
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
+    protected Scientist createEntity(ResultSet resultSet) throws SQLException {
+        Scientist scientist = new Scientist();
+        scientist.setScientistId(resultSet.getInt("scientist_id"));
+        scientist.setName(resultSet.getString("name"));
+        scientist.setEmail(resultSet.getString("email"));
 
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setString(1, scientist.getName());
-                statement.setString(2, scientist.getEmail());
-                statement.setInt(3, scientist.getDepartmentId());
-                statement.setInt(4, scientist.getAreaId());
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
+        Department department = new Department();
+        department.setDepartmentId(resultSet.getInt("department_id"));
+        department.setDepartmentName(resultSet.getString("department_name"));
+        scientist.setDepartment(department);
+
+        ResearchArea area = new ResearchArea();
+        area.setAreaId(resultSet.getInt("area_id"));
+        area.setAreaName(resultSet.getString("area_name"));
+        scientist.setArea(area);
+
+        return scientist;
     }
 
     @Override
-    public Scientist getScientistById(int id) throws SQLException {
-        String sql = "SELECT * FROM scientists WHERE scientist_id = ?";
-        DatabaseConnection dbConnection = null;
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, id);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        return new Scientist(
-                                resultSet.getInt("scientist_id"),
-                                resultSet.getString("name"),
-                                resultSet.getString("email"),
-                                resultSet.getInt("department_id"),
-                                resultSet.getInt("area_id")
-                        );
-                    }
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
-        return null;
+    protected String getReadQuery() {
+        return "SELECT s.*, d.department_name, a.area_name FROM scientists s " +
+                "LEFT JOIN departments d ON s.department_id = d.department_id " +
+                "LEFT JOIN research_areas a ON s.area_id = a.area_id " +
+                "WHERE scientist_id = ?";
     }
 
     @Override
-    public List<Scientist> getAllScientists() throws SQLException {
-        List<Scientist> scientists = new ArrayList<>();
-        String sql = "SELECT * FROM scientists";
-        DatabaseConnection dbConnection = null;
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql);
-                 ResultSet resultSet = statement.executeQuery()) {
-
-                while (resultSet.next()) {
-                    scientists.add(new Scientist(
-                            resultSet.getInt("scientist_id"),
-                            resultSet.getString("name"),
-                            resultSet.getString("email"),
-                            resultSet.getInt("department_id"),
-                            resultSet.getInt("area_id")
-                    ));
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
-        return scientists;
+    protected String getCreateQuery() {
+        return "INSERT INTO scientists (name, email, department_id, area_id) VALUES (?, ?, ?, ?)";
     }
 
     @Override
-    public void updateScientist(Scientist scientist) throws SQLException {
-        String sql = "UPDATE scientists SET name = ?, email = ?, department_id = ?, area_id = ? WHERE scientist_id = ?";
-        DatabaseConnection dbConnection = null;
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
+    protected void setCreateStatement(PreparedStatement statement, Scientist scientist) throws SQLException {
+        statement.setString(1, scientist.getName());
+        statement.setString(2, scientist.getEmail());
+        statement.setInt(3, scientist.getDepartment().getDepartmentId());
+        statement.setInt(4, scientist.getArea().getAreaId());
+    }
 
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setString(1, scientist.getName());
-                statement.setString(2, scientist.getEmail());
-                statement.setInt(3, scientist.getDepartmentId());
-                statement.setInt(4, scientist.getAreaId());
-                statement.setInt(5, scientist.getScientistId());
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
+
+
+
+    @Override
+    protected void setReadStatement(PreparedStatement statement, Integer id) throws SQLException {
+        statement.setInt(1, id);
     }
 
     @Override
-    public void deleteScientist(int id) throws SQLException {
-        String sql = "DELETE FROM scientists WHERE scientist_id = ?";
-        DatabaseConnection dbConnection = null;
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, id);
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
+    protected String getUpdateQuery() {
+        return "UPDATE scientists SET name = ?, email = ?, department_id = ?, area_id = ? WHERE scientist_id = ?";
     }
+
+    @Override
+    protected void setUpdateStatement(PreparedStatement statement, Scientist scientist) throws SQLException {
+        statement.setString(1, scientist.getName());
+        statement.setString(2, scientist.getEmail());
+        statement.setInt(3, scientist.getDepartment().getDepartmentId());
+        statement.setInt(4, scientist.getArea().getAreaId());
+        statement.setInt(5, scientist.getScientistId());
+    }
+
+    @Override
+    protected String getDeleteQuery() {
+        return "DELETE FROM scientists WHERE scientist_id = ?";
+    }
+
+    @Override
+    protected void setDeleteStatement(PreparedStatement statement, Integer id) throws SQLException {
+        statement.setInt(1, id);
+    }
+    @Override
+    protected String getFindAllQuery() {
+        return "SELECT s.*, d.department_name,a.area_name " +
+                "FROM scientists s " +
+                "LEFT JOIN departments d ON s.department_id = d.department_id "+
+                "LEFT JOIN research_areas a ON s.area_id=a.area_id";
+    }
+
 }
+
 

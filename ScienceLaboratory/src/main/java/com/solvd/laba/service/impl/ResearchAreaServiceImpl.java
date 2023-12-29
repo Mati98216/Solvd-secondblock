@@ -1,67 +1,60 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.ResearchAreaDAO;
 import com.solvd.laba.domain.ResearchArea;
+import com.solvd.laba.mybatis.ResearchAreaMapper;
 import com.solvd.laba.service.interfaces.ResearchAreaService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class ResearchAreaServiceImpl implements ResearchAreaService {
-    private ResearchAreaDAO researchAreaDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public ResearchAreaServiceImpl(ResearchAreaDAO researchAreaDAO) {
-        this.researchAreaDAO = researchAreaDAO;
+    public ResearchAreaServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addResearchArea(ResearchArea researchArea) throws ServiceException {
-        try {
-
-            researchAreaDAO.addResearchArea(researchArea);
-        } catch (SQLException | InterruptedException e) {
-            throw new ServiceException("Error adding research area", e);
+    public void addResearchArea(ResearchArea researchArea) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ResearchAreaMapper mapper = session.getMapper(ResearchAreaMapper.class);
+            mapper.insert(researchArea);
+            session.commit();
         }
     }
 
     @Override
-    public ResearchArea getResearchAreaById(int id) throws ServiceException {
-        try {
-
-            return researchAreaDAO.getResearchAreaById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving research area by ID", e);
+    public ResearchArea getResearchAreaById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ResearchAreaMapper mapper = session.getMapper(ResearchAreaMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<ResearchArea> getAllResearchAreas() throws ServiceException {
-        try {
-
-            return researchAreaDAO.getAllResearchAreas();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all research areas", e);
+    public List<ResearchArea> getAllResearchAreas() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ResearchAreaMapper mapper = session.getMapper(ResearchAreaMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updateResearchArea(ResearchArea researchArea) throws ServiceException {
-        try {
-
-            researchAreaDAO.updateResearchArea(researchArea);
-        } catch (SQLException e) {
-            throw new ServiceException("Error updating research area", e);
+    public void updateResearchArea(ResearchArea researchArea) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ResearchAreaMapper mapper = session.getMapper(ResearchAreaMapper.class);
+            mapper.update(researchArea);
+            session.commit();
         }
     }
 
     @Override
-    public void deleteResearchArea(int id) throws ServiceException {
-        try {
-
-            researchAreaDAO.deleteResearchArea(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting research area", e);
+    public void deleteResearchArea(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ResearchAreaMapper mapper = session.getMapper(ResearchAreaMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
 }

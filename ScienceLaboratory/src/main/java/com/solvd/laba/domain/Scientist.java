@@ -1,57 +1,30 @@
 package com.solvd.laba.domain;
 
-public class Scientist {
+import com.solvd.laba.dao.interfaces.IdentifiableEntity;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Scientist implements IdentifiableEntity<Integer> {
     private int scientistId;
     private String name;
     private String email;
-    private int departmentId;
-    private int areaId;
-
-    public Scientist(int scientistId, String name, String email, int departmentId, int areaId) {
-        this.scientistId = scientistId;
-        this.name = name;
-        this.email = email;
-        this.departmentId = departmentId;
-        this.areaId = areaId;
+    private Department department;
+    private ResearchArea area;
+    @Override
+    public void setId(Number id) {
+        this.scientistId = id.intValue();
     }
-
-    public int getScientistId() {
-        return scientistId;
-    }
-
-    public void setScientistId(int scientistId) {
-        this.scientistId = scientistId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public int getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(int departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public int getAreaId() {
-        return areaId;
-    }
-
-    public void setAreaId(int areaId) {
-        this.areaId = areaId;
+    @Override
+    public String toString() {
+        return "Scientist{" +
+                "scientistId=" + scientistId +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", department=" + (department != null ? department.getDepartmentName() : "null") +
+                ", area=" + (area != null ? area.getAreaName() : "null") +
+                '}';
     }
 }

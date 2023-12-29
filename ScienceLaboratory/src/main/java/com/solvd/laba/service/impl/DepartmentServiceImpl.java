@@ -1,70 +1,60 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.DepartmentDAO;
 import com.solvd.laba.domain.Department;
+import com.solvd.laba.mybatis.DepartmentMapper;
 import com.solvd.laba.service.interfaces.DepartmentService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class DepartmentServiceImpl implements DepartmentService {
-    private DepartmentDAO departmentDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public DepartmentServiceImpl(DepartmentDAO departmentDAO) {
-        this.departmentDAO = departmentDAO;
+    public DepartmentServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addDepartment(Department department) throws ServiceException {
-        try {
-
-            departmentDAO.addDepartment(department);
-        } catch (SQLException e) {
-            throw new ServiceException("Error adding department", e);
+    public void addDepartment(Department department) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            DepartmentMapper mapper = session.getMapper(DepartmentMapper.class);
+            mapper.insert(department);
+            session.commit();
         }
     }
 
     @Override
-    public Department getDepartmentById(int id) throws ServiceException {
-        try {
-
-            return departmentDAO.getDepartmentById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving department by ID", e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+    public Department getDepartmentById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            DepartmentMapper mapper = session.getMapper(DepartmentMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<Department> getAllDepartments() throws ServiceException {
-        try {
-
-            return departmentDAO.getAllDepartments();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all departments", e);
+    public List<Department> getAllDepartments() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            DepartmentMapper mapper = session.getMapper(DepartmentMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updateDepartment(Department department) throws ServiceException {
-        try {
-
-            departmentDAO.updateDepartment(department);
-        } catch (SQLException e) {
-            throw new ServiceException("Error updating department", e);
+    public void updateDepartment(Department department) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            DepartmentMapper mapper = session.getMapper(DepartmentMapper.class);
+            mapper.update(department);
+            session.commit();
         }
     }
 
     @Override
-    public void deleteDepartment(int id) throws ServiceException {
-        try {
-
-            departmentDAO.deleteDepartment(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting department", e);
+    public void deleteDepartment(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            DepartmentMapper mapper = session.getMapper(DepartmentMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
 }
-

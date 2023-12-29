@@ -1,159 +1,103 @@
 package com.solvd.laba.dao.impl;
 
-import com.solvd.laba.database.ConnectionPool;
 import com.solvd.laba.dao.interfaces.PublicationDAO;
-import com.solvd.laba.database.DatabaseConnection;
+import com.solvd.laba.database.ConnectionPool;
 import com.solvd.laba.domain.Publication;
+import com.solvd.laba.domain.Scientist;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-public class PublicationDAOImpl implements PublicationDAO {
-    private ConnectionPool connectionPool;
+public class PublicationDAOImpl extends AbstractDAO<Publication, Integer> implements PublicationDAO {
 
     public PublicationDAOImpl(ConnectionPool connectionPool) {
-        this.connectionPool = connectionPool;
+        super(connectionPool);
     }
 
     @Override
-    public void addPublication(Publication publication) throws SQLException {
-        String sql = "INSERT INTO publications (publication_title, publication_date, scientist_id) VALUES (?, ?, ?)";
-        DatabaseConnection dbConnection = null;
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
+    protected Publication createEntity(ResultSet resultSet) throws SQLException {
+        Publication publication = new Publication();
+        publication.setPublicationId(resultSet.getInt("publication_id"));
+        publication.setPublicationTitle(resultSet.getString("publication_title"));
+        publication.setPublicationDate(resultSet.getDate("publication_date"));
 
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setString(1, publication.getPublicationTitle());
-                statement.setDate(2, publication.getPublicationDate());
-                statement.setInt(3, publication.getScientistId());
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
-    }
-
-    @Override
-    public Publication getPublicationById(int id) throws SQLException {
-        String sql = "SELECT * FROM publications WHERE publication_id = ?";
-        Publication publication = null;
-        DatabaseConnection dbConnection = null;
-
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, id);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        publication = new Publication(
-                                resultSet.getInt("publication_id"),
-                                resultSet.getString("publication_title"),
-                                resultSet.getDate("publication_date"),
-                                resultSet.getInt("scientist_id")
-                        );
-                    }
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
+        Scientist scientist = new Scientist();
+        scientist.setScientistId(resultSet.getInt("scientist_id"));
+        scientist.setName(resultSet.getString("name"));
+        scientist.setEmail(resultSet.getString("email"));
         return publication;
     }
 
     @Override
-    public List<Publication> getAllPublications() throws SQLException {
+    protected String getCreateQuery() {
+        return "INSERT INTO publications (publication_title, publication_date, scientist_id) VALUES (?, ?, ?)";
+    }
+
+    @Override
+    protected void setCreateStatement(PreparedStatement statement, Publication publication) throws SQLException {
+        statement.setString(1, publication.getPublicationTitle());
+        statement.setDate(2, new java.sql.Date(publication.getPublicationDate().getTime()));
+        statement.setInt(3, publication.getScientist().getScientistId());
+    }
+
+    @Override
+    protected String getReadQuery() {
+        return "SELECT * FROM publications"+
+                "LEFT JOIN scientists s ON p.scientist_id = s.scientist_id"
+                +" WHERE publication_id = ?";
+    }
+
+    @Override
+    protected void setReadStatement(PreparedStatement statement, Integer id) throws SQLException {
+        statement.setInt(1, id);
+    }
+
+    @Override
+    protected String getUpdateQuery() {
+        return "UPDATE publications SET publication_title = ?, publication_date = ?, scientist_id = ? WHERE publication_id = ?";
+    }
+
+    @Override
+    protected void setUpdateStatement(PreparedStatement statement, Publication publication) throws SQLException {
+        statement.setString(1, publication.getPublicationTitle());
+        statement.setDate(2, new java.sql.Date(publication.getPublicationDate().getTime()));
+        statement.setInt(3, publication.getScientist().getScientistId());
+        statement.setInt(4, publication.getPublicationId());
+    }
+
+    @Override
+    protected String getDeleteQuery() {
+        return "DELETE FROM publications WHERE publication_id = ?";
+    }
+
+    @Override
+    protected void setDeleteStatement(PreparedStatement statement, Integer id) throws SQLException {
+        statement.setInt(1, id);
+    }
+
+    @Override
+    public List<Publication> findAll() throws SQLException {
         List<Publication> publications = new ArrayList<>();
-        String sql = "SELECT * FROM publications";
-        DatabaseConnection dbConnection = null;
+        try (Connection connection = connectionPool.getConnection().getSqlConnection();
+             PreparedStatement statement = connection.prepareStatement(getFindAllQuery())) {
 
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql);
-                 ResultSet resultSet = statement.executeQuery()) {
-
-                while (resultSet.next()) {
-                    publications.add(new Publication(
-                            resultSet.getInt("publication_id"),
-                            resultSet.getString("publication_title"),
-                            resultSet.getDate("publication_date"),
-                            resultSet.getInt("scientist_id")
-                    ));
-                }
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                publications.add(createEntity(resultSet));
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
+            throw new RuntimeException("Operation interrupted", e);
         }
         return publications;
     }
 
     @Override
-    public void updatePublication(Publication publication) throws SQLException {
-        String sql = "UPDATE publications SET publication_title = ?, publication_date = ?, scientist_id = ? WHERE publication_id = ?";
-        DatabaseConnection dbConnection = null;
-
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setString(1, publication.getPublicationTitle());
-                statement.setDate(2, publication.getPublicationDate());
-                statement.setInt(3, publication.getScientistId());
-                statement.setInt(4, publication.getPublicationId());
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
+    protected String getFindAllQuery() {
+        return "SELECT p.*, s.name, s.email, s.department_id, s.area_id " +
+                "FROM publications p " +
+                "LEFT JOIN scientists s ON p.scientist_id = s.scientist_id";
     }
 
-    @Override
-    public void deletePublication(int id) throws SQLException {
-        String sql = "DELETE FROM publications WHERE publication_id = ?";
-        DatabaseConnection dbConnection = null;
-
-        try {
-            dbConnection = connectionPool.getConnection();
-            Connection sqlConnection = dbConnection.getSqlConnection();
-
-            try (PreparedStatement statement = sqlConnection.prepareStatement(sql)) {
-                statement.setInt(1, id);
-                statement.executeUpdate();
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to get a connection from the pool", e);
-        } finally {
-            if (dbConnection != null) {
-                connectionPool.releaseConnection(dbConnection);
-            }
-        }
-    }
 }
 

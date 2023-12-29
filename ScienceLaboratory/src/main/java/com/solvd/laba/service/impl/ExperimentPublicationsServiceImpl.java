@@ -1,65 +1,60 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.ExperimentPublicationsDAO;
 import com.solvd.laba.domain.ExperimentPublications;
+import com.solvd.laba.mybatis.ExperimentPublicationsMapper;
 import com.solvd.laba.service.interfaces.ExperimentPublicationsService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class ExperimentPublicationsServiceImpl implements ExperimentPublicationsService {
-    private ExperimentPublicationsDAO experimentPublicationsDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public ExperimentPublicationsServiceImpl(ExperimentPublicationsDAO experimentPublicationsDAO) {
-        this.experimentPublicationsDAO = experimentPublicationsDAO;
+    public ExperimentPublicationsServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addExperimentPublications(ExperimentPublications experimentPublications) throws ServiceException {
-
-        try {
-            experimentPublicationsDAO.addExperimentPublications(experimentPublications);
-        } catch (SQLException e) {
-            throw new ServiceException("Error adding experiment publication", e);
+    public void addExperimentPublications(ExperimentPublications experimentPublications) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentPublicationsMapper mapper = session.getMapper(ExperimentPublicationsMapper.class);
+            mapper.insert(experimentPublications);
+            session.commit();
         }
     }
 
     @Override
-    public ExperimentPublications getExperimentPublicationsById(int id) throws ServiceException {
-        try {
-            return experimentPublicationsDAO.getExperimentPublicationsById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving experiment publication by ID", e);
+    public ExperimentPublications getExperimentPublicationsById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentPublicationsMapper mapper = session.getMapper(ExperimentPublicationsMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<ExperimentPublications> getAllExperimentPublications() throws ServiceException {
-        try {
-            return experimentPublicationsDAO.getAllExperimentPublications();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all experiment publications", e);
+    public List<ExperimentPublications> getAllExperimentPublications() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentPublicationsMapper mapper = session.getMapper(ExperimentPublicationsMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updateExperimentPublications(ExperimentPublications experimentPublications) throws ServiceException {
-
-        try {
-            experimentPublicationsDAO.updateExperimentPublications(experimentPublications);
-        } catch (SQLException e) {
-            throw new ServiceException("Error updating experiment publication", e);
+    public void updateExperimentPublications(ExperimentPublications experimentPublications) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentPublicationsMapper mapper = session.getMapper(ExperimentPublicationsMapper.class);
+            mapper.update(experimentPublications);
+            session.commit();
         }
     }
 
     @Override
-    public void deleteExperimentPublications(int id) throws ServiceException {
-        try {
-            experimentPublicationsDAO.deleteExperimentPublications(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting experiment publication", e);
+    public void deleteExperimentPublications(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentPublicationsMapper mapper = session.getMapper(ExperimentPublicationsMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
-
 }

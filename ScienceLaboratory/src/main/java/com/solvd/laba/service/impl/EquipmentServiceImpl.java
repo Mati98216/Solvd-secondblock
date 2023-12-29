@@ -1,63 +1,60 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.EquipmentDAO;
 import com.solvd.laba.domain.Equipment;
+import com.solvd.laba.mybatis.EquipmentMapper;
 import com.solvd.laba.service.interfaces.EquipmentService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class EquipmentServiceImpl implements EquipmentService {
-    private EquipmentDAO equipmentDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public EquipmentServiceImpl(EquipmentDAO equipmentDAO) {
-        this.equipmentDAO = equipmentDAO;
+    public EquipmentServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addEquipment(Equipment equipment) throws ServiceException {
-        try {
-            equipmentDAO.addEquipment(equipment);
-        } catch (SQLException e) {
-            throw new ServiceException("Error adding equipment", e);
+    public void addEquipment(Equipment equipment) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            EquipmentMapper mapper = session.getMapper(EquipmentMapper.class);
+            mapper.insert(equipment);
+            session.commit();
         }
     }
 
     @Override
-    public Equipment getEquipmentById(int id) throws ServiceException {
-        try {
-            return equipmentDAO.getEquipmentById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving equipment by ID", e);
+    public Equipment getEquipmentById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            EquipmentMapper mapper = session.getMapper(EquipmentMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<Equipment> getAllEquipment() throws ServiceException {
-        try {
-            return equipmentDAO.getAllEquipment();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all equipment", e);
+    public List<Equipment> getAllEquipment() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            EquipmentMapper mapper = session.getMapper(EquipmentMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updateEquipment(Equipment equipment) throws ServiceException {
-        try {
-            equipmentDAO.updateEquipment(equipment);
-        } catch (SQLException | InterruptedException e) {
-            throw new ServiceException("Error updating equipment", e);
+    public void updateEquipment(Equipment equipment) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            EquipmentMapper mapper = session.getMapper(EquipmentMapper.class);
+            mapper.update(equipment);
+            session.commit();
         }
     }
 
     @Override
-    public void deleteEquipment(int id) throws ServiceException {
-        try {
-            equipmentDAO.deleteEquipment(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting equipment", e);
+    public void deleteEquipment(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            EquipmentMapper mapper = session.getMapper(EquipmentMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
-
 }

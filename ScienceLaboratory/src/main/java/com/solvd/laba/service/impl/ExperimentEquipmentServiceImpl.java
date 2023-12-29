@@ -1,68 +1,61 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.ExperimentEquipmentDAO;
 import com.solvd.laba.domain.ExperimentEquipment;
+import com.solvd.laba.mybatis.ExperimentEquipmentMapper;
 import com.solvd.laba.service.interfaces.ExperimentEquipmentService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class ExperimentEquipmentServiceImpl implements ExperimentEquipmentService {
-    private ExperimentEquipmentDAO experimentEquipmentDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public ExperimentEquipmentServiceImpl(ExperimentEquipmentDAO experimentEquipmentDAO) {
-        this.experimentEquipmentDAO = experimentEquipmentDAO;
+    public ExperimentEquipmentServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addExperimentEquipment(ExperimentEquipment equipment) throws ServiceException {
-
-        try {
-            experimentEquipmentDAO.addExperimentEquipment(equipment);
-        } catch (SQLException e) {
-            throw new ServiceException("Error adding experiment equipment", e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+    public void addExperimentEquipment(ExperimentEquipment experimentEquipment) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentEquipmentMapper mapper = session.getMapper(ExperimentEquipmentMapper.class);
+            mapper.insert(experimentEquipment);
+            session.commit();
         }
     }
 
     @Override
-    public ExperimentEquipment getExperimentEquipmentById(int id) throws ServiceException {
-        try {
-            return experimentEquipmentDAO.getExperimentEquipmentById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving experiment equipment by ID", e);
+    public ExperimentEquipment getExperimentEquipmentById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentEquipmentMapper mapper = session.getMapper(ExperimentEquipmentMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<ExperimentEquipment> getAllExperimentEquipments() throws ServiceException {
-        try {
-            return experimentEquipmentDAO.getAllExperimentEquipments();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all experiment equipments", e);
+    public List<ExperimentEquipment> getAllExperimentEquipment() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentEquipmentMapper mapper = session.getMapper(ExperimentEquipmentMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updateExperimentEquipment(ExperimentEquipment equipment) throws ServiceException {
-
-        try {
-            experimentEquipmentDAO.updateExperimentEquipment(equipment);
-        } catch (SQLException e) {
-            throw new ServiceException("Error updating experiment equipment", e);
+    public void updateExperimentEquipment(ExperimentEquipment experimentEquipment) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentEquipmentMapper mapper = session.getMapper(ExperimentEquipmentMapper.class);
+            mapper.update(experimentEquipment);
+            session.commit();
         }
     }
 
     @Override
-    public void deleteExperimentEquipment(int id) throws ServiceException {
-        try {
-            experimentEquipmentDAO.deleteExperimentEquipment(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting experiment equipment", e);
+    public void deleteExperimentEquipment(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentEquipmentMapper mapper = session.getMapper(ExperimentEquipmentMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
-
-
 }
+

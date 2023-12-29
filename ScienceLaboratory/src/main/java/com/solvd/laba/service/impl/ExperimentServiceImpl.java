@@ -1,66 +1,61 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.ExperimentDAO;
 import com.solvd.laba.domain.Experiment;
+import com.solvd.laba.mybatis.ExperimentMapper;
 import com.solvd.laba.service.interfaces.ExperimentService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class ExperimentServiceImpl implements ExperimentService {
-    private ExperimentDAO experimentDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public ExperimentServiceImpl(ExperimentDAO experimentDAO) {
-        this.experimentDAO = experimentDAO;
+    public ExperimentServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addExperiment(Experiment experiment) throws ServiceException {
-
-        try {
-            experimentDAO.addExperiment(experiment);
-        } catch (SQLException | InterruptedException e) {
-            throw new ServiceException("Error adding experiment", e);
+    public void addExperiment(Experiment experiment) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentMapper mapper = session.getMapper(ExperimentMapper.class);
+            mapper.insert(experiment);
+            session.commit();
         }
     }
 
     @Override
-    public Experiment getExperimentById(int id) throws ServiceException {
-        try {
-            return experimentDAO.getExperimentById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving experiment by ID", e);
+    public Experiment getExperimentById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentMapper mapper = session.getMapper(ExperimentMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<Experiment> getAllExperiments() throws ServiceException {
-        try {
-            return experimentDAO.getAllExperiments();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all experiments", e);
+    public List<Experiment> getAllExperiments() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentMapper mapper = session.getMapper(ExperimentMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updateExperiment(Experiment experiment) throws ServiceException {
-
-        try {
-            experimentDAO.updateExperiment(experiment);
-        } catch (SQLException e) {
-            throw new ServiceException("Error updating experiment", e);
+    public void updateExperiment(Experiment experiment) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentMapper mapper = session.getMapper(ExperimentMapper.class);
+            mapper.update(experiment);
+            session.commit();
         }
     }
 
     @Override
-    public void deleteExperiment(int id) throws ServiceException {
-        try {
-            experimentDAO.deleteExperiment(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting experiment", e);
+    public void deleteExperiment(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentMapper mapper = session.getMapper(ExperimentMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
-
-
 }
+

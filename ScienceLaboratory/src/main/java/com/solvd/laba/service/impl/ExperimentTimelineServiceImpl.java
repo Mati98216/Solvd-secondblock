@@ -1,63 +1,60 @@
 package com.solvd.laba.service.impl;
 
-import com.google.protobuf.ServiceException;
-import com.solvd.laba.dao.interfaces.ExperimentTimelineDAO;
 import com.solvd.laba.domain.ExperimentTimeline;
+import com.solvd.laba.mybatis.ExperimentTimelineMapper;
 import com.solvd.laba.service.interfaces.ExperimentTimelineService;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class ExperimentTimelineServiceImpl implements ExperimentTimelineService {
-    private ExperimentTimelineDAO timelineDAO;
+    private final SqlSessionFactory sqlSessionFactory;
 
-    public ExperimentTimelineServiceImpl(ExperimentTimelineDAO timelineDAO) {
-        this.timelineDAO = timelineDAO;
+    public ExperimentTimelineServiceImpl(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
-    public void addExperimentTimeline(ExperimentTimeline timeline) throws ServiceException {
-        try {
-            timelineDAO.addExperimentTimeline(timeline);
-        } catch (SQLException | InterruptedException e) {
-            throw new ServiceException("Error adding experiment timeline", e);
+    public void addExperimentTimeline(ExperimentTimeline experimentTimeline) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentTimelineMapper mapper = session.getMapper(ExperimentTimelineMapper.class);
+            mapper.insert(experimentTimeline);
+            session.commit();
         }
     }
 
     @Override
-    public ExperimentTimeline getExperimentTimelineById(int id) throws ServiceException {
-        try {
-            return timelineDAO.getExperimentTimelineById(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving experiment timeline by ID", e);
+    public ExperimentTimeline getExperimentTimelineById(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentTimelineMapper mapper = session.getMapper(ExperimentTimelineMapper.class);
+            return mapper.getById(id);
         }
     }
 
     @Override
-    public List<ExperimentTimeline> getAllExperimentTimelines() throws ServiceException {
-        try {
-            return timelineDAO.getAllExperimentTimelines();
-        } catch (SQLException e) {
-            throw new ServiceException("Error retrieving all experiment timelines", e);
+    public List<ExperimentTimeline> getAllExperimentTimelines() {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentTimelineMapper mapper = session.getMapper(ExperimentTimelineMapper.class);
+            return mapper.findAll();
         }
     }
 
     @Override
-    public void updateExperimentTimeline(ExperimentTimeline timeline) throws ServiceException {
-        try {
-            timelineDAO.updateExperimentTimeline(timeline);
-        } catch (SQLException e) {
-            throw new ServiceException("Error updating experiment timeline", e);
+    public void updateExperimentTimeline(ExperimentTimeline experimentTimeline) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentTimelineMapper mapper = session.getMapper(ExperimentTimelineMapper.class);
+            mapper.update(experimentTimeline);
+            session.commit();
         }
     }
 
     @Override
-    public void deleteExperimentTimeline(int id) throws ServiceException {
-        try {
-            timelineDAO.deleteExperimentTimeline(id);
-        } catch (SQLException e) {
-            throw new ServiceException("Error deleting experiment timeline", e);
+    public void deleteExperimentTimeline(int id) {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            ExperimentTimelineMapper mapper = session.getMapper(ExperimentTimelineMapper.class);
+            mapper.delete(id);
+            session.commit();
         }
     }
-
 }
