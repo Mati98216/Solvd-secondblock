@@ -1,4 +1,4 @@
-package com.solvd.laba.service.impl;
+package com.solvd.laba.service.mybatis;
 
 import com.solvd.laba.domain.Department;
 import com.solvd.laba.mybatis.DepartmentMapper;

@@ -1,4 +1,4 @@
-package com.solvd.laba.service.impl;
+package com.solvd.laba.service.mybatis;
 
 import com.solvd.laba.domain.Publication;
 import com.solvd.laba.mybatis.PublicationMapper;

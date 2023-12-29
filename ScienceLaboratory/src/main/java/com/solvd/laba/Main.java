@@ -3,7 +3,7 @@ package com.solvd.laba;
 import com.solvd.laba.domain.Department;
 import com.solvd.laba.domain.ResearchArea;
 import com.solvd.laba.domain.Scientist;
-import com.solvd.laba.service.impl.ScientistServiceImpl;
+import com.solvd.laba.service.jdbc.ScientistServiceImpl;
 import com.solvd.laba.service.interfaces.ScientistService;
 
 public class Main {
@@ -14,7 +14,7 @@ public class Main {
             // Example of adding a new scientist
             Department department = new Department(1, "Biology");
             ResearchArea area = new ResearchArea(1, "Genetics");
-            Scientist newScientist = new Scientist(0, "Jane Doe", "jane.deose@example.com", department, area);
+            Scientist newScientist = new Scientist(0, "Jane Doe", "jane.dedose@example.com", department, area);
             scientistService.addScientist(newScientist);
 
             // Example of retrieving and updating a scientist
@@ -25,7 +25,7 @@ public class Main {
             }
 
             // Example of deleting a scientist
-            scientistService.deleteScientist(181);
+            scientistService.deleteScientist(182);
 
             // Example of retrieving all scientists
             for (Scientist s : scientistService.getAllScientists()) {
