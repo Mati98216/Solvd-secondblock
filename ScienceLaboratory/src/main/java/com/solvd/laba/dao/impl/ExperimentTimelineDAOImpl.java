@@ -20,7 +20,7 @@ public class ExperimentTimelineDAOImpl extends AbstractDAO<ExperimentTimeline, I
         ExperimentTimeline timeline = new ExperimentTimeline();
         timeline.setTimelineId(resultSet.getInt("timeline_id"));
 
-        Experiment experiment = new Experiment(); // Assuming you have a method to create an Experiment object
+        Experiment experiment = new Experiment(); 
         experiment.setExperimentId(resultSet.getInt("experiment_id"));
 
         timeline.setExperiment(experiment);
