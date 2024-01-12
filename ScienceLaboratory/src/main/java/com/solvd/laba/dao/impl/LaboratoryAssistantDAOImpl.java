@@ -22,18 +22,23 @@ public class LaboratoryAssistantDAOImpl extends AbstractDAO<LaboratoryAssistant,
         assistant.setAssistantId(resultSet.getInt("assistant_id"));
         assistant.setName(resultSet.getString("name"));
         assistant.setEmail(resultSet.getString("email"));
+        assistant.setDepartment(createDepartment(resultSet));
+        assistant.setArea(createResearchArea(resultSet));
+        return assistant;
+    }
 
+    private Department createDepartment(ResultSet resultSet) throws SQLException {
         Department department = new Department();
         department.setDepartmentId(resultSet.getInt("department_id"));
         department.setDepartmentName(resultSet.getString("department_name"));
-        assistant.setDepartment(department);
+        return department;
+    }
 
+    private ResearchArea createResearchArea(ResultSet resultSet) throws SQLException {
         ResearchArea area = new ResearchArea();
         area.setAreaId(resultSet.getInt("area_id"));
         area.setAreaName(resultSet.getString("area_name"));
-        assistant.setArea(area);
-
-        return assistant;
+        return area;
     }
 
     @Override
@@ -53,9 +58,9 @@ public class LaboratoryAssistantDAOImpl extends AbstractDAO<LaboratoryAssistant,
     protected String getReadQuery() {
         return "SELECT la.*, d.department_name, ra.area_name " +
                 "FROM laboratory_assistants la " +
-                "LEFT JOIN departments d ON la.department_id = d.department_id " +
-                "LEFT JOIN research_areas ra ON la.area_id = ra.area_id " +
-                "WHERE la.assistant_id = ?";
+                "JOIN departments d ON la.department_id = d.department_id " +
+                "JOIN research_areas ra ON la.area_id = ra.area_id " +
+                "WHERE assistant_id = ?";
     }
 
     @Override
@@ -88,25 +93,10 @@ public class LaboratoryAssistantDAOImpl extends AbstractDAO<LaboratoryAssistant,
     }
 
     @Override
-    public List<LaboratoryAssistant> findAll() throws SQLException {
-        List<LaboratoryAssistant> assistants = new ArrayList<>();
-        try (Connection connection = connectionPool.getConnection().getSqlConnection();
-             PreparedStatement statement = connection.prepareStatement(getFindAllQuery())) {
-
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                assistants.add(createEntity(resultSet));
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Operation interrupted", e);
-        }
-        return assistants;
-    }
-
     protected String getFindAllQuery() {
         return "SELECT la.*, d.department_name, ra.area_name " +
                 "FROM laboratory_assistants la " +
-                "LEFT JOIN departments d ON la.department_id = d.department_id " +
-                "LEFT JOIN research_areas ra ON la.area_id = ra.area_id";
+                "JOIN departments d ON la.department_id = d.department_id " +
+                "JOIN research_areas ra ON la.area_id = ra.area_id";
     }
 }

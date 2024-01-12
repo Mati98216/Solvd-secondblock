@@ -1,14 +1,15 @@
 package com.solvd.laba.service.interfaces;
 
+import com.google.protobuf.ServiceException;
 import com.solvd.laba.domain.Analysis;
 
 import java.util.List;
 
 public interface AnalysisService {
-    void addAnalysis(Analysis analysis);
-    Analysis getAnalysisById(int id);
-    List<Analysis> getAllAnalysis();
-    void updateAnalysis(Analysis analysis);
-    void deleteAnalysis(int id);
+    void addAnalysis(Analysis analysis) throws ServiceException;
+    Analysis getAnalysisById(int id) throws ServiceException;
+    List<Analysis> getAllAnalysis() throws ServiceException;
+    void updateAnalysis(Analysis analysis) throws ServiceException;
+    void deleteAnalysis(int id) throws ServiceException;
 }
 

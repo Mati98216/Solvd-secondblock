@@ -7,10 +7,13 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Analysis {
+public class Analysis implements IdentifiableEntity<Integer>{
     private int analysisId;
     private String analysisName;
     private Scientist scientist;
     private LaboratoryAssistant assistant;
-
+    @Override
+    public void setId(Number id) {
+        this.analysisId = id.intValue();
+    }
 }

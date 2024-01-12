@@ -100,5 +100,3 @@ public class ScientistDAOImpl extends AbstractDAO<Scientist, Integer> implements
     }
 
 }
-
-

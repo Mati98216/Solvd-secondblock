@@ -5,16 +5,21 @@ import com.solvd.laba.mybatis.LaboratoryAssistantMapper;
 import com.solvd.laba.service.interfaces.LaboratoryAssistantService;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class LaboratoryAssistantServiceImpl implements LaboratoryAssistantService {
     private final SqlSessionFactory sqlSessionFactory;
 
-    public LaboratoryAssistantServiceImpl(SqlSessionFactory sqlSessionFactory) {
-        this.sqlSessionFactory = sqlSessionFactory;
+    public LaboratoryAssistantServiceImpl() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("mybatis-config.xml")) {
+            this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing SqlSessionFactory", e);
+        }
     }
-
     @Override
     public void addLaboratoryAssistant(LaboratoryAssistant laboratoryAssistant) {
         try (SqlSession session = sqlSessionFactory.openSession()) {

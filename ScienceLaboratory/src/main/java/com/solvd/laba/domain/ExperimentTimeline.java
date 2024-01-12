@@ -10,10 +10,13 @@ import java.sql.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExperimentTimeline  {
+public class ExperimentTimeline implements IdentifiableEntity<Integer> {
     private int timelineId;
     private Experiment experiment;
     private Date startDate;
     private Date endDate;
-
+    @Override
+    public void setId(Number id) {
+        this.timelineId = id.intValue();
+    }
 }

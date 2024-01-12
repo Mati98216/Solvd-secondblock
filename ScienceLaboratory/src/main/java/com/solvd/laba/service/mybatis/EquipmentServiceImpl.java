@@ -5,14 +5,20 @@ import com.solvd.laba.mybatis.EquipmentMapper;
 import com.solvd.laba.service.interfaces.EquipmentService;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class EquipmentServiceImpl implements EquipmentService {
     private final SqlSessionFactory sqlSessionFactory;
 
-    public EquipmentServiceImpl(SqlSessionFactory sqlSessionFactory) {
-        this.sqlSessionFactory = sqlSessionFactory;
+    public EquipmentServiceImpl() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("mybatis-config.xml")) {
+            this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing SqlSessionFactory", e);
+        }
     }
 
     @Override

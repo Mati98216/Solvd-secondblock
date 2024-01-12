@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ScientistServiceImpl implements ScientistService {
 
-    private ScientistDAO scientistDAO;
+    private final  ScientistDAO scientistDAO;
 
 
 

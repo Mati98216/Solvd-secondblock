@@ -19,17 +19,20 @@ public class ExperimentTimelineDAOImpl extends AbstractDAO<ExperimentTimeline, I
     protected ExperimentTimeline createEntity(ResultSet resultSet) throws SQLException {
         ExperimentTimeline timeline = new ExperimentTimeline();
         timeline.setTimelineId(resultSet.getInt("timeline_id"));
-
-        Experiment experiment = new Experiment(); // Assuming you have a method to create an Experiment object
-        experiment.setExperimentId(resultSet.getInt("experiment_id"));
-
-        timeline.setExperiment(experiment);
-
+        timeline.setExperiment(createExperiment(resultSet));
         timeline.setStartDate(resultSet.getDate("start_date"));
         timeline.setEndDate(resultSet.getDate("end_date"));
-
         return timeline;
     }
+
+    private Experiment createExperiment(ResultSet resultSet) throws SQLException {
+        Experiment experiment = new Experiment();
+        experiment.setExperimentId(resultSet.getInt("experiment_id"));
+        experiment.setExperimentName(resultSet.getString("experiment_name"));
+        return experiment;
+    }
+
+
 
     @Override
     protected String getCreateQuery() {
@@ -45,10 +48,10 @@ public class ExperimentTimelineDAOImpl extends AbstractDAO<ExperimentTimeline, I
 
     @Override
     protected String getReadQuery() {
-        return "SELECT et.*, e.experiment_name " +
+        return "SELECT et.*, e.experiment_name"+
                 "FROM experiment_timelines et " +
-                "LEFT JOIN experiments e ON et.experiment_id = e.experiment_id " +
-                "WHERE et.timeline_id = ?";
+                "JOIN experiments e ON et.experiment_id = e.experiment_id " +
+                "WHERE timeline_id = ?";
     }
 
     @Override
@@ -80,25 +83,10 @@ public class ExperimentTimelineDAOImpl extends AbstractDAO<ExperimentTimeline, I
     }
 
     @Override
-    public List<ExperimentTimeline> findAll() throws SQLException {
-        List<ExperimentTimeline> timelines = new ArrayList<>();
-        try (Connection connection = connectionPool.getConnection().getSqlConnection();
-             PreparedStatement statement = connection.prepareStatement(getFindAllQuery())) {
-
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                timelines.add(createEntity(resultSet));
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Operation interrupted", e);
-        }
-        return timelines;
-    }
-
     protected String getFindAllQuery() {
         return "SELECT et.*, e.experiment_name " +
                 "FROM experiment_timelines et " +
-                "LEFT JOIN experiments e ON et.experiment_id = e.experiment_id";
+                "JOIN experiments e ON et.experiment_id = e.experiment_id ";
     }
 }
 

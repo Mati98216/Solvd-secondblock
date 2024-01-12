@@ -1,5 +1,6 @@
 package com.solvd.laba.mybatis;
 
+import com.solvd.laba.domain.Experiment;
 import com.solvd.laba.domain.Publication;
 import org.apache.ibatis.annotations.*;
 
@@ -44,4 +45,24 @@ public interface PublicationMapper {
             @Result(property = "scientist.name", column = "scientist_name")
     })
     List<Publication> findAll();
+
+    @Insert("INSERT INTO experiment_publications (publication_id, experiment_id) VALUES (#{publicationId}, #{experimentId})")
+    void addExperimentToPublication(@Param("publicationId") int publicationId, @Param("experimentId") int experimentId);
+
+    @Select("SELECT e.* FROM experiments e " +
+            "JOIN experiment_publications ep ON e.experiment_id = ep.experiment_id " +
+            "WHERE ep.publication_id = #{publicationId}")
+    List<Experiment> getExperimentsForPublication(int publicationId);
+
+    @Delete("DELETE FROM experiment_publications WHERE publication_id = #{publicationId} AND experiment_id = #{experimentId}")
+    void removeExperimentFromPublication(@Param("publicationId") int publicationId, @Param("experimentId") int experimentId);
+
+    @Update("UPDATE experiment_publications SET experiment_id = #{newExperimentId} " +
+            "WHERE publication_id = #{publicationId} AND experiment_id = #{oldExperimentId}")
+    void updateExperimentForPublication(@Param("publicationId") int publicationId,
+                                        @Param("oldExperimentId") int oldExperimentId,
+                                        @Param("newExperimentId") int newExperimentId);
+
+
 }
+

@@ -5,14 +5,20 @@ import com.solvd.laba.mybatis.DepartmentMapper;
 import com.solvd.laba.service.interfaces.DepartmentService;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class DepartmentServiceImpl implements DepartmentService {
-    private final SqlSessionFactory sqlSessionFactory;
+    private  SqlSessionFactory sqlSessionFactory;
 
-    public DepartmentServiceImpl(SqlSessionFactory sqlSessionFactory) {
-        this.sqlSessionFactory = sqlSessionFactory;
+    public DepartmentServiceImpl() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("mybatis-config.xml")) {
+            this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing SqlSessionFactory", e);
+        }
     }
 
     @Override

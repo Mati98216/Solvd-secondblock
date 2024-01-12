@@ -2,6 +2,7 @@ package com.solvd.laba.dao.impl;
 
 import com.solvd.laba.dao.interfaces.PublicationDAO;
 import com.solvd.laba.database.ConnectionPool;
+import com.solvd.laba.domain.Experiment;
 import com.solvd.laba.domain.Publication;
 import com.solvd.laba.domain.Scientist;
 
@@ -23,9 +24,9 @@ public class PublicationDAOImpl extends AbstractDAO<Publication, Integer> implem
         publication.setPublicationDate(resultSet.getDate("publication_date"));
 
         Scientist scientist = new Scientist();
-        scientist.setScientistId(resultSet.getInt("scientist_id"));
         scientist.setName(resultSet.getString("name"));
-        scientist.setEmail(resultSet.getString("email"));
+        publication.setScientist(scientist);
+
         return publication;
     }
 
@@ -43,9 +44,11 @@ public class PublicationDAOImpl extends AbstractDAO<Publication, Integer> implem
 
     @Override
     protected String getReadQuery() {
-        return "SELECT * FROM publications"+
-                "LEFT JOIN scientists s ON p.scientist_id = s.scientist_id"
-                +" WHERE publication_id = ?";
+        return "SELECT p.*, s.*, d.department_id, d.department_name " +
+                "FROM publications p " +
+                "JOIN scientists s ON p.scientist_id = s.scientist_id " +
+                "LEFT JOIN departments d ON s.department_id = d.department_id " +
+                "WHERE publication_id = ?";
     }
 
     @Override
@@ -77,27 +80,69 @@ public class PublicationDAOImpl extends AbstractDAO<Publication, Integer> implem
     }
 
     @Override
-    public List<Publication> findAll() throws SQLException {
-        List<Publication> publications = new ArrayList<>();
+    protected String getFindAllQuery() {
+        return "SELECT p.*, s.*, d.department_id, d.department_name " +
+                "FROM publications p " +
+                "JOIN scientists s ON p.scientist_id = s.scientist_id " +
+                "LEFT JOIN departments d ON s.department_id = d.department_id";
+    }
+    @Override
+    public void addExperimentToPublication(int publicationId, int experimentId) throws SQLException, InterruptedException {
         try (Connection connection = connectionPool.getConnection().getSqlConnection();
-             PreparedStatement statement = connection.prepareStatement(getFindAllQuery())) {
-
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                publications.add(createEntity(resultSet));
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Operation interrupted", e);
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO experiment_publications (publication_id, experiment_id) VALUES (?, ?)")) {
+            statement.setInt(1, publicationId);
+            statement.setInt(2, experimentId);
+            statement.executeUpdate();
         }
-        return publications;
     }
 
     @Override
-    protected String getFindAllQuery() {
-        return "SELECT p.*, s.name, s.email, s.department_id, s.area_id " +
-                "FROM publications p " +
-                "LEFT JOIN scientists s ON p.scientist_id = s.scientist_id";
+    public List<Experiment> getExperimentsForPublication(int publicationId) throws SQLException {
+        List<Experiment> experiments = new ArrayList<>();
+        try (Connection connection = connectionPool.getConnection().getSqlConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT e.* FROM experiments e " +
+                             "JOIN experiment_publications ep ON e.experiment_id = ep.experiment_id " +
+                             "WHERE ep.publication_id = ?")) {
+            statement.setInt(1, publicationId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Experiment experiment = new Experiment();
+                    experiment.setExperimentId(resultSet.getInt("experiment_id"));
+                    experiment.setExperimentName(resultSet.getString("experiment_name"));
+                    experiments.add(experiment);
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return experiments;
     }
 
+    @Override
+    public void updateExperimentForPublication(int publicationId, int oldExperimentId, int newExperimentId) throws SQLException {
+        try (Connection connection = connectionPool.getConnection().getSqlConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "UPDATE experiment_publications SET experiment_id = ? WHERE publication_id = ? AND experiment_id = ?")) {
+            statement.setInt(1, newExperimentId);
+            statement.setInt(2, publicationId);
+            statement.setInt(3, oldExperimentId);
+            statement.executeUpdate();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void removeExperimentFromPublication(int publicationId, int experimentId) throws SQLException, InterruptedException {
+        try (Connection connection = connectionPool.getConnection().getSqlConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "DELETE FROM experiment_publications WHERE publication_id = ? AND experiment_id = ?")) {
+            statement.setInt(1, publicationId);
+            statement.setInt(2, experimentId);
+            statement.executeUpdate();
+        }
+    }
 }
 

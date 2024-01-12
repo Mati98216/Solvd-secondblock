@@ -20,7 +20,7 @@ public abstract class AbstractDAO<T, ID> implements GenericDAO<T, ID> {
         this.connectionPool = connectionPool;
     }
 
-    protected abstract T createEntity(ResultSet resultSet) throws SQLException;
+    protected abstract T createEntity(ResultSet resultSet) throws SQLException, InterruptedException;
 
     protected abstract String getCreateQuery();
     protected abstract void setCreateStatement(PreparedStatement statement, T entity) throws SQLException;
@@ -80,7 +80,7 @@ public abstract class AbstractDAO<T, ID> implements GenericDAO<T, ID> {
     @Override
     public T read(ID id) throws SQLException, InterruptedException {
         DatabaseConnection dbConnection = connectionPool.getConnection();
-        try (Connection connection = dbConnection.getSqlConnection(); // Correctly retrieve the SQL connection
+        try (Connection connection = dbConnection.getSqlConnection();
              PreparedStatement statement = connection.prepareStatement(getReadQuery())) {
 
             setReadStatement(statement, id);
@@ -92,7 +92,7 @@ public abstract class AbstractDAO<T, ID> implements GenericDAO<T, ID> {
                 return null;
             }
         } finally {
-            connectionPool.releaseConnection(dbConnection); // Make sure to release the connection
+            connectionPool.releaseConnection(dbConnection);
         }
     }
 

@@ -44,7 +44,7 @@ public class ConnectionPool {
     }
 
     public DatabaseConnection getConnection() throws InterruptedException {
-        DatabaseConnection connection = connections.take(); // Blocking call until a connection is available
+        DatabaseConnection connection = connections.take();
         logger.info("Acquired Connection ID: " + connection.getConnectionId());
         return connection;
     }

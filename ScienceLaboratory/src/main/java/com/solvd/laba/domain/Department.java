@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Department{
+public class Department implements IdentifiableEntity<Integer>{
     private int departmentId;
     private String departmentName;
 
@@ -17,5 +17,9 @@ public class Department{
                 "departmentId=" + departmentId +
                 ", departmentName='" + departmentName + '\'' +
                 '}';
+    }
+    @Override
+    public void setId(Number id) {
+        this.departmentId = id.intValue();
     }
 }

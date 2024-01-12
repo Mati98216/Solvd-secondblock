@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResearchArea {
+public class ResearchArea implements IdentifiableEntity<Integer> {
     private int areaId;
     private String areaName;
 
@@ -17,5 +17,9 @@ public class ResearchArea {
                 "areaId=" + areaId +
                 ", areaName='" + areaName + '\'' +
                 '}';
+    }
+    @Override
+    public void setId(Number id) {
+        this.areaId = id.intValue();
     }
 }

@@ -61,8 +61,10 @@ public class ResearchAreaDAOImpl extends AbstractDAO<ResearchArea, Integer> impl
         statement.setInt(1, id);
     }
 
+    @Override
     protected String getFindAllQuery() {
         return "SELECT * FROM research_areas";
     }
 }
+
 

@@ -9,11 +9,21 @@
                 <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
                 <property name="url" value="jdbc:mysql://localhost:3306/science_laboratory"/>
                 <property name="username" value="root"/>
-                <property name="password" value="root"/>
+                <property name="password" value="Mati98216"/>
             </dataSource>
         </environment>
     </environments>
     <mappers>
         <mapper class="com.solvd.laba.mybatis.ScientistMapper"/>
+        <mapper class="com.solvd.laba.mybatis.ResearchAreaMapper"/>
+        <mapper class="com.solvd.laba.mybatis.PublicationMapper"/>
+        <mapper class="com.solvd.laba.mybatis.LaboratoryAssistantMapper"/>
+        <mapper class="com.solvd.laba.mybatis.EquipmentMapper"/>
+        <mapper class="com.solvd.laba.mybatis.DepartmentMapper"/>
+        <mapper class="com.solvd.laba.mybatis.AnalysisMapper"/>
+        <mapper class="com.solvd.laba.mybatis.ExperimentMapper"/>
+        <mapper class="com.solvd.laba.mybatis.ExperimentResultMapper"/>
+        <mapper class="com.solvd.laba.mybatis.ExperimentTimelineMapper"/>
+
     </mappers>
 </configuration>

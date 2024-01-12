@@ -64,23 +64,7 @@ public class DepartmentDAOImpl extends AbstractDAO<Department, Integer> implemen
     }
 
     @Override
-    public List<Department> findAll() throws SQLException {
-        List<Department> departments = new ArrayList<>();
-        try (Connection connection = connectionPool.getConnection().getSqlConnection();
-             PreparedStatement statement = connection.prepareStatement(getFindAllQuery())) {
-
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                departments.add(createEntity(resultSet));
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Operation interrupted", e);
-        }
-        return departments;
-    }
-
     protected String getFindAllQuery() {
         return "SELECT * FROM departments";
     }
 }
-

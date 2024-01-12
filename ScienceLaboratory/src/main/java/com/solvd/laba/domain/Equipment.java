@@ -7,9 +7,16 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Equipment  {
+public class Equipment implements IdentifiableEntity<Integer> {
     private int equipmentId;
     private String equipmentName;
     private Department department;
 
+    public Equipment(int equipmentId, String equipmentName) {
+    }
+
+    @Override
+    public void setId(Number id) {
+        this.equipmentId = id.intValue();
+    }
 }
