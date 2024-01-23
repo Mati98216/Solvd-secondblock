@@ -29,5 +29,16 @@ public class Publication implements IdentifiableEntity<Integer> {
     public void setId(Number id) {
         this.publicationId = id.intValue();
     }
+
+    @Override
+    public String toString() {
+        return "Publication{" +
+                "publicationId=" + publicationId +
+                ", publicationTitle='" + publicationTitle + '\'' +
+                ", publicationDate=" + publicationDate +
+                ", scientist=" + scientist +
+                ", experimentList=" + experimentList +
+                '}';
+    }
 }
 

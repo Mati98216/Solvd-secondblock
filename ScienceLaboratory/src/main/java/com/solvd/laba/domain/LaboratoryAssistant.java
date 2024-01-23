@@ -17,4 +17,15 @@ public class LaboratoryAssistant implements IdentifiableEntity<Integer>{
     public void setId(Number id) {
         this.assistantId = id.intValue();
     }
+
+    @Override
+    public String toString() {
+        return "LaboratoryAssistant{" +
+                "assistantId=" + assistantId +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", department=" + department +
+                ", area=" + area +
+                '}';
+    }
 }

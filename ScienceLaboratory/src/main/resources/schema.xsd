@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- Definition of ExperimentType -->
+    <xs:complexType name="ExperimentType">
+        <xs:sequence>
+            <xs:element name="experimentId" type="xs:int"/>
+            <xs:element name="experimentName" type="xs:string"/>
+            <xs:element name="scientist" type="ScientistType"/>
+            <xs:element name="equipmentList" type="EquipmentListType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition of ScientistType -->
+    <xs:complexType name="ScientistType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="email" type="xs:string"/>
+            <xs:element name="department" type="DepartmentType"/>
+            <xs:element name="researchArea" type="ResearchAreaType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition of ResearchAreaType -->
+    <xs:complexType name="ResearchAreaType">
+        <xs:sequence>
+            <xs:element name="areaId" type="xs:int"/>
+            <xs:element name="areaName" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition of DepartmentType -->
+    <xs:complexType name="DepartmentType">
+        <xs:sequence>
+            <xs:element name="departmentId" type="xs:int"/>
+            <xs:element name="departmentName" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition of EquipmentListType -->
+    <xs:complexType name="EquipmentListType">
+        <xs:sequence>
+            <xs:element name="equipment" type="EquipmentType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition of EquipmentType -->
+    <xs:complexType name="EquipmentType">
+        <xs:sequence>
+            <xs:element name="equipmentId" type="xs:int"/>
+            <xs:element name="equipmentName" type="xs:string"/>
+            <xs:element name="department" type="DepartmentType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition of ExperimentTimelineType -->
+    <xs:complexType name="ExperimentTimelineType">
+        <xs:sequence>
+            <xs:element name="timelineId" type="xs:int"/>
+            <xs:element name="startDate" type="xs:date"/>
+            <xs:element name="endDate" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Root Element -->
+    <xs:element name="root">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="experiment" type="ExperimentType"/>
+                <xs:element name="experimentTimeline" type="ExperimentTimelineType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

@@ -1,0 +1,42 @@
+<root>
+    <experiment>
+        <experimentId>1001</experimentId>
+        <experimentName>Genetic Research on Wheat</experimentName>
+        <scientist>
+            <id>1</id>
+            <name>Dr. Emily Watson</name>
+            <email>emily.watson@researchlab.com</email>
+            <department>
+                <departmentId>101</departmentId>
+                <departmentName>Biology</departmentName>
+            </department>
+            <researchArea>
+                <areaId>501</areaId>
+                <areaName>Botany</areaName>
+            </researchArea>
+        </scientist>
+        <equipmentList>
+            <equipment>
+                <equipmentId>10001</equipmentId>
+                <equipmentName>Centrifuge</equipmentName>
+                <department>
+                    <departmentId>102</departmentId>
+                    <departmentName>Biotechnology</departmentName>
+                </department>
+            </equipment>
+            <equipment>
+                <equipmentId>10002</equipmentId>
+                <equipmentName>Microscope</equipmentName>
+                <department>
+                    <departmentId>103</departmentId>
+                    <departmentName>Microbiology</departmentName>
+                </department>
+            </equipment>
+        </equipmentList>
+    </experiment>
+    <experimentTimeline>
+        <timelineId>2001</timelineId>
+        <startDate>2024-01-01</startDate>
+        <endDate>2024-12-31</endDate>
+    </experimentTimeline>
+</root>

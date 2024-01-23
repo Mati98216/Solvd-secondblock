@@ -18,14 +18,21 @@ public class ExperimentResultServiceImpl implements ExperimentResultService {
     }
 
     @Override
-    public void addExperimentResult(ExperimentResult experimentResult) throws ServiceException {
+    public void addExperimentResult(ExperimentResult dto) throws ServiceException {
         try {
+
+            ExperimentResult experimentResult = new ExperimentResult.Builder()
+                    .resultId(dto.getResultId())
+                    .experiment(dto.getExperiment())
+                    .analysis(dto.getAnalysis())
+                    .resultDetails(dto.getResultDetails())
+                    .build();
+
             experimentResultDAO.create(experimentResult);
         } catch (Exception e) {
             throw new ServiceException("Error adding experiment result", e);
         }
     }
-
     @Override
     public ExperimentResult getExperimentResultById(int id) throws ServiceException {
         try {

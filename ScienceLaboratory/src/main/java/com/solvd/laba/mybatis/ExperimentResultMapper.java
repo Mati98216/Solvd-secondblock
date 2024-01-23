@@ -12,19 +12,12 @@ public interface ExperimentResultMapper {
     @Options(useGeneratedKeys = true, keyProperty = "resultId")
     void insert(ExperimentResult experimentResult);
 
-    @Select("SELECT er.*, e.experiment_name, a.analysis_name " +
+    @Select("SELECT er.result_id, er.experiment_id, er.analysis_id, er.result_details, " +
+            "e.experiment_name, a.analysis_name " +
             "FROM experiment_results er " +
             "JOIN experiments e ON er.experiment_id = e.experiment_id " +
             "JOIN analyses a ON er.analysis_id = a.analysis_id " +
-            "WHERE result_id = #{id}")
-    @Results(value = {
-            @Result(property = "resultId", column = "result_id"),
-            @Result(property = "experiment.experimentId", column = "experiment_id"),
-            @Result(property = "experiment.name", column = "experiment_name"),
-            @Result(property = "analysis.analysisId", column = "analysis_id"),
-            @Result(property = "analysis.name", column = "analysis_name"),
-            @Result(property = "resultDetails", column = "result_details")
-    })
+            "WHERE er.result_id = #{id}")
     ExperimentResult getById(int id);
 
     @Update("UPDATE experiment_results SET experiment_id = #{experiment.experimentId}, " +
@@ -35,18 +28,10 @@ public interface ExperimentResultMapper {
     @Delete("DELETE FROM experiment_results WHERE result_id = #{id}")
     void delete(int id);
 
-    @Select("SELECT er.*, e.experiment_name, a.analysis_name " +
+    @Select("SELECT er.result_id, er.experiment_id, er.analysis_id, er.result_details, " +
+            "e.experiment_name, a.analysis_name " +
             "FROM experiment_results er " +
             "JOIN experiments e ON er.experiment_id = e.experiment_id " +
             "JOIN analyses a ON er.analysis_id = a.analysis_id")
-    @Results(value = {
-            @Result(property = "resultId", column = "result_id"),
-            @Result(property = "experiment.experimentId", column = "experiment_id"),
-            @Result(property = "experiment.name", column = "experiment_name"),
-            @Result(property = "analysis.analysisId", column = "analysis_id"),
-            @Result(property = "analysis.name", column = "analysis_name"),
-            @Result(property = "resultDetails", column = "result_details")
-    })
     List<ExperimentResult> findAll();
 }
-

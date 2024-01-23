@@ -16,4 +16,14 @@ public class Analysis implements IdentifiableEntity<Integer>{
     public void setId(Number id) {
         this.analysisId = id.intValue();
     }
+
+    @Override
+    public String toString() {
+        return "Analysis{" +
+                "analysisId=" + analysisId +
+                ", analysisName='" + analysisName + '\'' +
+                ", scientist=" + scientist +
+                ", assistant=" + assistant +
+                '}';
+    }
 }

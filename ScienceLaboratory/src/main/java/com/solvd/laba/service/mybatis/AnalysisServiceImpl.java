@@ -5,14 +5,20 @@ import com.solvd.laba.mybatis.AnalysisMapper;
 import com.solvd.laba.service.interfaces.AnalysisService;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class AnalysisServiceImpl implements AnalysisService {
-    private final SqlSessionFactory sqlSessionFactory;
+    private SqlSessionFactory sqlSessionFactory ;
 
-    public AnalysisServiceImpl(SqlSessionFactory sqlSessionFactory) {
-        this.sqlSessionFactory = sqlSessionFactory;
+    public AnalysisServiceImpl() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("mybatis-config.xml")) {
+            this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing SqlSessionFactory", e);
+        }
     }
 
     @Override

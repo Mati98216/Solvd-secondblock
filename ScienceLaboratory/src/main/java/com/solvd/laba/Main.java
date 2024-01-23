@@ -3,7 +3,7 @@ package com.solvd.laba;
 import com.solvd.laba.domain.Department;
 import com.solvd.laba.domain.ResearchArea;
 import com.solvd.laba.domain.Scientist;
-import com.solvd.laba.service.jdbc.*;
+import com.solvd.laba.service.mybatis.*;
 import com.solvd.laba.service.interfaces.ScientistService;
 
 import com.solvd.laba.domain.*;
@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.Date;
 
 public class Main {
-    private static final Logger logger = LogManager.getLogger(Main.class);
+    public static final Logger logger = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
         ScientistService scientistService = new ScientistServiceImpl();
@@ -22,16 +22,16 @@ public class Main {
         EquipmentService equipmentService = new EquipmentServiceImpl();
         PublicationService publicationService = new PublicationServiceImpl();
         LaboratoryAssistantService laboratoryAssistantService = new LaboratoryAssistantServiceImpl();
-
+        AnalysisService analysisService= new AnalysisServiceImpl();
         try {
             // Adding a new scientist
             Department department = new Department(1, "Biology");
             ResearchArea area = new ResearchArea(1, "Genetics");
-            Scientist newScientist = new Scientist(333, "Jane Doe", "jane.ds@example.com", department, area);
+            Scientist newScientist = new Scientist(333, "Jane Doe", "DSAfdDSAD.ds@eddxamdsaple.com", department, area);
             scientistService.addScientist(newScientist);
 
             // Adding a laboratory assistant
-            LaboratoryAssistant assistant = new LaboratoryAssistant(0, "ds Doe", "ds.dssdgfdljytrllbgdsbbsdoe@example.com", department, area);
+            LaboratoryAssistant assistant = new LaboratoryAssistant(0, "ds DdDfdSsdddsdssDSADSAdsadssdsdsoe", "ds.dsadfdddssdsassdsdsddsgfdsdljytrllbgdsbbsdoe@example.com", department, area);
             laboratoryAssistantService.addLaboratoryAssistant(assistant);
 
             // Adding equipment
@@ -42,7 +42,16 @@ public class Main {
             Experiment experiment = new Experiment(0, "DNA Analysis", newScientist);
             experimentService.addExperiment(experiment);
             experimentService.addEquipmentToExperiment(experiment.getExperimentId(), microscope.getEquipmentId());
-
+            //Adding Analysis
+            Analysis analysis = new Analysis(100,"DNA Analysis",newScientist,assistant);
+            analysisService.addAnalysis(analysis);
+            //Adding ExperimentResul
+            ExperimentResult result = new ExperimentResult.Builder()
+                    .resultId(100)
+                    .experiment(experiment)
+                    .analysis(analysis)
+                    .resultDetails("Details of the result")
+                    .build();
             // Publishing results
             java.util.Date currentDate = new java.util.Date();
             java.sql.Date sqlDate = new java.sql.Date(currentDate.getTime());
@@ -56,7 +65,9 @@ public class Main {
                 retrievedScientist.setName("Jane Smith");
                 scientistService.updateScientist(retrievedScientist);
             }
+            //Display Analysis info
 
+            logger.info(analysisService.getAnalysisById(12));
             // Deleting a scientist
             scientistService.deleteScientist(177);
             // Retrieving and displaying all scientists

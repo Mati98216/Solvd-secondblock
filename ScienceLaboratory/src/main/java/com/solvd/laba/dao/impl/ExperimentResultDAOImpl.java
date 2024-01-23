@@ -18,12 +18,12 @@ public class ExperimentResultDAOImpl extends AbstractDAO<ExperimentResult, Integ
 
     @Override
     protected ExperimentResult createEntity(ResultSet resultSet) throws SQLException {
-        ExperimentResult result = new ExperimentResult();
-        result.setResultId(resultSet.getInt("result_id"));
-        result.setExperiment(createExperiment(resultSet));
-        result.setAnalysis(createAnalysis(resultSet));
-        result.setResultDetails(resultSet.getString("result_details"));
-        return result;
+        return new ExperimentResult.Builder()
+                .resultId(resultSet.getInt("result_id"))
+                .experiment(createExperiment(resultSet))
+                .analysis(createAnalysis(resultSet))
+                .resultDetails(resultSet.getString("result_details"))
+                .build();
     }
 
     private Experiment createExperiment(ResultSet resultSet) throws SQLException {

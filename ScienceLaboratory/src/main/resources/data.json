@@ -1,0 +1,85 @@
+{
+  "experiments": [
+    {
+      "experimentId": 1001,
+      "experimentName": "Genetic Research on Wheat",
+      "scientist": {
+        "id": 1,
+        "name": "Dr. Emily Watson",
+        "email": "emily.watson@researchlab.com",
+        "department": {
+          "departmentId": 101,
+          "departmentName": "Biology"
+        },
+        "researchArea": {
+          "areaId": 501,
+          "areaName": "Botany"
+        }
+      },
+      "equipmentList": [
+        {
+          "equipmentId": 10001,
+          "equipmentName": "Centrifuge",
+          "department": {
+            "departmentId": 102,
+            "departmentName": "Biotechnology"
+          }
+        },
+        {
+          "equipmentId": 10002,
+          "equipmentName": "Microscope",
+          "department": {
+            "departmentId": 103,
+            "departmentName": "Microbiology"
+          }
+        }
+      ],
+      "experimentTimeline": {
+        "timelineId": 2001,
+        "startDate": "2024-01-01",
+        "endDate": "2024-12-31"
+      }
+    },
+    {
+      "experimentId": 1002,
+      "experimentName": "Climate Change Impact Study",
+      "scientist": {
+        "id": 2,
+        "name": "Dr. John Doe",
+        "email": "john.doe@climatestudy.org",
+        "department": {
+          "departmentId": 102,
+          "departmentName": "Environmental Science"
+        },
+        "researchArea": {
+          "areaId": 502,
+          "areaName": "Ecology"
+        }
+      },
+      "equipmentList": [
+        {
+          "equipmentId": 10003,
+          "equipmentName": "Thermometer",
+          "department": {
+            "departmentId": 104,
+            "departmentName": "Climatology"
+          }
+        },
+        {
+          "equipmentId": 10004,
+          "equipmentName": "Barometer",
+          "department": {
+            "departmentId": 105,
+            "departmentName": "Atmospheric Science"
+          }
+        }
+      ],
+      "experimentTimeline": {
+        "timelineId": 2002,
+        "startDate": "2024-02-15",
+        "endDate": "2024-11-20"
+      }
+    }
+  ]
+}
+

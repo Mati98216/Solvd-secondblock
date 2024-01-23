@@ -20,7 +20,7 @@ public class AnalysisDAOImpl extends AbstractDAO<Analysis, Integer> implements A
     protected Analysis createEntity(ResultSet resultSet) throws SQLException {
         Analysis analysis = new Analysis();
         analysis.setAnalysisId(resultSet.getInt("analysis_id"));
-        analysis.setAnalysisName(resultSet.getString("analysis_name"));
+        analysis.setAnalysisName(resultSet.getString("analysis_description"));
         analysis.setScientist(createScientist(resultSet));
         analysis.setAssistant(createLaboratoryAssistant(resultSet));
         return analysis;
@@ -46,7 +46,7 @@ public class AnalysisDAOImpl extends AbstractDAO<Analysis, Integer> implements A
 
     @Override
     protected String getCreateQuery() {
-        return "INSERT INTO analysis (analysis_name, scientist_id, assistant_id) VALUES (?, ?, ?)";
+        return "INSERT INTO analysis (analysis_description, scientist_id, assistant_id) VALUES (?, ?, ?)";
     }
 
     @Override
@@ -59,7 +59,7 @@ public class AnalysisDAOImpl extends AbstractDAO<Analysis, Integer> implements A
     @Override
     protected String getReadQuery() {
         return "SELECT a.*, s.scientist_id, s.name as scientist_name, s.email as scientist_email, " +
-                "la.assistant_id, la.name as assistant_name, la.email as assistant_email, " +
+                "la.assistant_id, la.name as assistant_name, la.email as assistant_email " +
                 "FROM analysis a " +
                 "JOIN scientists s ON a.scientist_id = s.scientist_id " +
                 "JOIN laboratory_assistants la ON a.assistant_id = la.assistant_id " +
@@ -73,7 +73,7 @@ public class AnalysisDAOImpl extends AbstractDAO<Analysis, Integer> implements A
 
     @Override
     protected String getUpdateQuery() {
-        return "UPDATE analysis SET analysis_name = ?, scientist_id = ?, assistant_id = ? WHERE analysis_id = ?";
+        return "UPDATE analysis SET analysis_description = ?, scientist_id = ?, assistant_id = ? WHERE analysis_id = ?";
     }
 
     @Override

@@ -46,8 +46,8 @@ public interface PublicationMapper {
     })
     List<Publication> findAll();
 
-    @Insert("INSERT INTO experiment_publications (publication_id, experiment_id) VALUES (#{publicationId}, #{experimentId})")
-    void addExperimentToPublication(@Param("publicationId") int publicationId, @Param("experimentId") int experimentId);
+    @Insert("INSERT INTO experiment_publications (experiment_id,publication_id) VALUES (#{experimentId}, #{publicationId})")
+    void addExperimentToPublication(@Param("experimentId") int experimentId, @Param("publicationId") int publicationId);
 
     @Select("SELECT e.* FROM experiments e " +
             "JOIN experiment_publications ep ON e.experiment_id = ep.experiment_id " +

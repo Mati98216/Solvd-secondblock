@@ -64,10 +64,10 @@ public class PublicationServiceImpl implements PublicationService {
             session.commit();
         }
     }
-    public void addExperimentToPublication(int publicationId, int experimentId) {
+    public void addExperimentToPublication(int experimentId, int publicationId) {
         try (SqlSession session = sqlSessionFactory.openSession()) {
             PublicationMapper mapper = session.getMapper(PublicationMapper.class);
-            mapper.addExperimentToPublication(publicationId, experimentId);
+            mapper.addExperimentToPublication(experimentId, publicationId);
             session.commit();
         }
     }
